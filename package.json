@@ -10,6 +10,10 @@
     "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+   "repository": {
+    "type": "git",
+    "url": "https://github.com/khanh2kjr/mor-react-common.git"
+  },
   "author": "khanh2kjr - MOR Software JSC",
   "license": "ISC",
   "peerDependencies": {
