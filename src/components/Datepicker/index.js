@@ -3,7 +3,14 @@ import PropTypes from 'prop-types'
 import MonthPicker from '../MonthPicker'
 import YearPicker from '../YearPicker'
 import CalendarIcon from '../CalendarIcon'
-import { DATE_MONTH_TYPE, MATRIX_CALENDAR_TOTAL, currentYear, currentMonth, currentDate } from '../../constants'
+import {
+  DATE_MONTH_TYPE,
+  MATRIX_CALENDAR_TOTAL,
+  currentYear,
+  currentMonth,
+  currentDate,
+  FORMAT_FORWARD_SLASH_YYYYMMDD,
+} from '../../constants'
 import { useClickOutside } from '../../hooks'
 import {
   chunkArray,
