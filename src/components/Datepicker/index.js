@@ -13,12 +13,12 @@ import {
   getTotalDateFromYearMonth,
   getWeekNumber,
   setDateDisabled,
-  getValueShoot,
 } from '../../utils'
 import './style.css'
 
 const Datepicker = (props) => {
-  const { value, picker, disabled, format, placeholder, className, minDate, maxDate, dayLabels, monthLabels } = props
+  const { value, picker, disabled, format, placeholder, className, minDate, maxDate, dayLabels, monthLabels, onChange } =
+    props
 
   const [year, setYear] = useState(() => (value ? new Date(formatDateValue(value, format)).getFullYear() : currentYear))
   const [month, setMonth] = useState(() => (value ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth))
@@ -156,6 +156,14 @@ const Datepicker = (props) => {
   const isShowFullCalendar = useMemo(() => {
     return isShowDatepicker || isShowWeekPicker
   }, [isShowDatepicker, isShowWeekPicker])
+
+  const getValueShoot = ({ year, month, date }) => {
+    const _year = getPerfectDate(year)
+    const _month = getPerfectDate(month)
+    const _date = getPerfectDate(date)
+    const valueDate = [_year, _month, _date]
+    return format === FORMAT_FORWARD_SLASH_YYYYMMDD ? valueDate.join('/') : valueDate.reverse().join('/')
+  }
 
   const getDateClassName = (dateMonthType, { year, month, date }) => {
     let initClassName = 'mor-date'
