@@ -1,6 +1,6 @@
 {
   "name": "mor-react-common",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "MOR common component",
   "main": "dist/index.js",
   "module": "dist/index.js",
