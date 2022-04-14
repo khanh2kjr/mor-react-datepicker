@@ -1,3 +1,8 @@
+.mor-datepicker,
+.mor-datepicker * {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 .mor-datepicker {
   position: relative;
   display: flex;
