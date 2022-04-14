@@ -58,7 +58,7 @@ const Datepicker = (props) => {
       prev: month === 1 ? 12 : month - 1,
       next: month === 12 ? 1 : month + 1,
     }
-  }, [])
+  }, [month])
 
   const firstDayOfMonth = useMemo(() => {
     const dateObject = new Date([year, month, 1].join('/'))
