@@ -1,9 +1,11 @@
 import { useEffect, useMemo } from 'react'
 import { setDateDisabled } from '../../utils'
-import { currentYear } from '../Datepicker'
+import { currentYear } from '../../constants'
 import './style.css'
 
-const YearPicker = ({ value, valueGlobal, month, date, minDate, maxDate, format, onChange }) => {
+const YearPicker = (props) => {
+  const { value, valueGlobal, month, date, minDate, maxDate, format, onChange } = props
+
   const listYears = useMemo(() => {
     const result = []
     for (let year = 1900; year <= 2100; year++) {

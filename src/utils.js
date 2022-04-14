@@ -56,6 +56,16 @@ export const setDateDisabled = (minDate, maxDate, format, dateValue) => {
   )
 }
 
+export const getValueShoot = ({ year, month, date }) => {
+  const _year = getPerfectDate(year)
+  const _month = getPerfectDate(month)
+  const _date = getPerfectDate(date)
+  const valueDate = [_year, _month, _date]
+  return format === FORMAT_FORWARD_SLASH_YYYYMMDD
+    ? valueDate.join('/')
+    : valueDate.reverse().join('/')
+}
+
 export const getWeekNumber = (d) => {
   d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7))

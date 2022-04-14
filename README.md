@@ -1,6 +1,5 @@
 # mor-react-datepicker
 
-
 `mor-react-datepicker` is a datepicker ReactJS component.
 
 # Getting started
@@ -18,22 +17,24 @@ Alternatively, you may use the provided UMD builds directly in the `<script>` ta
 ```javascript
 import Datepicker from 'mor-react-datepicker'
 
-const config = {
-  // todo
-}
-
 const MyComponent = () => {
   const [value, setValue] = useState('')
-  
+
   const handleValueChange = (newValue) => {
     setValue(newValue)
   }
 
   return (
     <Datepicker
+      picker="date"
+      placeholder="Select date"
+      format="YYYY/MM/DD"
+      minDate="2011/08/22"
+      maxDate="2022/10/27"
+      disabled={false}
+      dayLabels={['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']}
+      monthLabels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Oct', 'Nov', 'Dec']}
       value={value}
-      picker={picker}
-      config={config}
       onChange={handleValueChange}
     />
   )
@@ -41,7 +42,6 @@ const MyComponent = () => {
 
 export default MyComponent
 ```
-
 
 ## License
 

@@ -1,3 +1,8 @@
+const currentDateObject = new Date()
+export const currentYear = currentDateObject.getFullYear()
+export const currentMonth = currentDateObject.getMonth() + 1
+export const currentDate = currentDateObject.getDate()
+
 export const FORMAT_FORWARD_SLASH_YYYYMMDD = 'YYYY/MM/DD'
 
 export const DATE_MONTH_TYPE = {

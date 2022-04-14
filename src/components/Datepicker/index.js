@@ -1,8 +1,10 @@
 import React, { useState, useMemo, useRef, Fragment } from 'react'
+import PropTypes from 'prop-types'
 import MonthPicker from '../MonthPicker'
 import YearPicker from '../YearPicker'
 import CalendarIcon from '../CalendarIcon'
-import './style.css'
+import { DATE_MONTH_TYPE, MATRIX_CALENDAR_TOTAL, currentYear, currentMonth, currentDate } from '../../constants'
+import { useClickOutside } from '../../hooks'
 import {
   chunkArray,
   formatDateValue,
@@ -11,46 +13,24 @@ import {
   getTotalDateFromYearMonth,
   getWeekNumber,
   setDateDisabled,
+  getValueShoot,
 } from '../../utils'
-import {
-  FORMAT_FORWARD_SLASH_YYYYMMDD,
-  DATE_MONTH_TYPE,
-  MATRIX_CALENDAR_TOTAL,
-} from '../../constants'
-import { useClickOutside } from '../../hooks'
+import './style.css'
 
-const currentDateObject = new Date()
-export const currentYear = currentDateObject.getFullYear()
-export const currentMonth = currentDateObject.getMonth() + 1
-export const currentDate = currentDateObject.getDate()
+const Datepicker = (props) => {
+  const { value, picker, disabled, format, placeholder, className, minDate, maxDate, dayLabels, monthLabels } = props
 
-const Datepicker = ({
-  value,
-  placeholder,
-  disabled,
-  className,
-  format,
-  picker,
-  config,
-  onChange,
-}) => {
-  const [year, setYear] = useState(() =>
-    value ? new Date(formatDateValue(value, format)).getFullYear() : currentYear
-  )
-  const [month, setMonth] = useState(() =>
-    value ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth
-  )
-  const [date, setDate] = useState(() =>
-    value ? new Date(formatDateValue(value, format)).getDate() : currentDate
-  )
-  const [valueHover, setValueHover] = useState('')
-  const [weekData, setWeekData] = useState({ value: null, date, month, year })
-  const [weekDataHover, setWeekDataHover] = useState({ value: null, date, month, year })
-  const [hasShowPicker, setHasShowPicker] = useState(false)
-  const [isShowMonthPicker, setIsShowMonthPicker] = useState(() => picker === 'month')
+  const [year, setYear] = useState(() => (value ? new Date(formatDateValue(value, format)).getFullYear() : currentYear))
+  const [month, setMonth] = useState(() => (value ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth))
+  const [date, setDate] = useState(() => (value ? new Date(formatDateValue(value, format)).getDate() : currentDate))
   const [isShowDatepicker, setIsShowDatepicker] = useState(() => picker === 'date')
   const [isShowYearPicker, setIsShowYearPicker] = useState(() => picker === 'year')
   const [isShowWeekPicker, setIsShowWeekPicker] = useState(() => picker === 'week')
+  const [isShowMonthPicker, setIsShowMonthPicker] = useState(() => picker === 'month')
+  const [valueHover, setValueHover] = useState('')
+  const [hasShowPicker, setHasShowPicker] = useState(false)
+  const [weekData, setWeekData] = useState({ value: null, date, month, year })
+  const [weekDataHover, setWeekDataHover] = useState({ value: null, date, month, year })
 
   const morDatepickerRef = useRef()
   const morPickerContainerRef = useRef()
@@ -59,17 +39,26 @@ const Datepicker = ({
     setHasShowPicker(false)
   })
 
-  const minDate = useMemo(() => {
-    if (!config.minDate)
-      return format === FORMAT_FORWARD_SLASH_YYYYMMDD ? '1900/01/01' : '01/01/1900'
-    return config.minDate
-  }, [format, config.minDate])
+  const valueView = useMemo(() => {
+    if (valueHover || weekDataHover.value) {
+      return weekDataHover.value ? [weekDataHover.year, getOrdinalSuffixOf(weekDataHover.value)].join('-') : valueHover
+    }
+    return weekData.value ? [weekData.year, getOrdinalSuffixOf(weekData.value)].join('-') : value
+  }, [value, valueHover, weekData, weekDataHover])
 
-  const maxDate = useMemo(() => {
-    if (!config.maxDate)
-      return format === FORMAT_FORWARD_SLASH_YYYYMMDD ? '2100/31/12' : '31/12/2100'
-    return config.maxDate
-  }, [format, config.maxDate])
+  const yearStepAction = useMemo(() => {
+    return {
+      prev: month === 1 ? year - 1 : year,
+      next: month === 12 ? year + 1 : year,
+    }
+  }, [year, month])
+
+  const monthStepAction = useMemo(() => {
+    return {
+      prev: month === 1 ? 12 : month - 1,
+      next: month === 12 ? 1 : month + 1,
+    }
+  }, [])
 
   const firstDayOfMonth = useMemo(() => {
     const dateObject = new Date([year, month, 1].join('/'))
@@ -79,23 +68,20 @@ const Datepicker = ({
 
   const datesOldMonth = useMemo(() => {
     const result = []
-    const _year = month === 1 ? year - 1 : year
-    const _month = month === 1 ? 12 : month - 1
-    const countDateOldMonth = getTotalDateFromYearMonth(_year, _month)
+    const countDateOldMonth = getTotalDateFromYearMonth(yearStepAction.prev, monthStepAction.prev)
     const dateFirstCalendar = countDateOldMonth - (firstDayOfMonth - 1)
     for (let i = dateFirstCalendar; i <= countDateOldMonth; i++) {
       result.push({
         dateMonthType: DATE_MONTH_TYPE.OLD_MONTH,
         value: {
           date: i,
-          month: _month,
-          year: _year,
+          month: monthStepAction.prev,
+          year: yearStepAction.prev,
         },
       })
     }
-
     return result
-  }, [year, month, firstDayOfMonth])
+  }, [yearStepAction, monthStepAction, firstDayOfMonth])
 
   const datesCurrentMonth = useMemo(() => {
     const result = []
@@ -115,21 +101,19 @@ const Datepicker = ({
 
   const datesFutureMonth = useMemo(() => {
     const result = []
-    const _year = month === 12 ? year + 1 : year
-    const _month = month === 12 ? 1 : month + 1
     const countDateOldMonthAndCurrentMonth = datesOldMonth.length + datesCurrentMonth.length
     for (let i = 1; i <= MATRIX_CALENDAR_TOTAL - countDateOldMonthAndCurrentMonth; i++) {
       result.push({
         dateMonthType: DATE_MONTH_TYPE.FUTURE_MONTH,
         value: {
           date: i,
-          month: _month,
-          year: _year,
+          month: monthStepAction.next,
+          year: yearStepAction.next,
         },
       })
     }
     return result
-  }, [year, month, datesOldMonth, datesCurrentMonth])
+  }, [yearStepAction, monthStepAction, datesOldMonth, datesCurrentMonth])
 
   const weeks = useMemo(() => {
     return chunkArray([...datesOldMonth, ...datesCurrentMonth, ...datesFutureMonth], 7)
@@ -144,23 +128,19 @@ const Datepicker = ({
   }, [year, month, format, minDate, maxDate])
 
   const isPrevMonthDisabled = useMemo(() => {
-    const _year = month === 1 ? year - 1 : year
-    const _month = month === 1 ? 12 : month - 1
     const _date = new Date(minDate).getDate()
     return setDateDisabled(minDate, maxDate, format, {
-      year: _year,
-      month: _month,
+      year: yearStepAction.prev,
+      month: monthStepAction.prev,
       date: _date,
     })
   }, [year, month, format, minDate, maxDate])
 
   const isNextMonthDisabled = useMemo(() => {
-    const _year = month === 12 ? year + 1 : year
-    const _month = month === 12 ? 1 : month + 1
     const _date = new Date(maxDate).getDate()
     return setDateDisabled(minDate, maxDate, format, {
-      year: _year,
-      month: _month,
+      year: yearStepAction.next,
+      month: monthStepAction.next,
       date: _date,
     })
   }, [year, month, format, minDate, maxDate])
@@ -176,15 +156,6 @@ const Datepicker = ({
   const isShowFullCalendar = useMemo(() => {
     return isShowDatepicker || isShowWeekPicker
   }, [isShowDatepicker, isShowWeekPicker])
-
-  const valueView = useMemo(() => {
-    if (valueHover || weekDataHover.value) {
-      return weekDataHover.value
-        ? [weekDataHover.year, getOrdinalSuffixOf(weekDataHover.value)].join('-')
-        : valueHover
-    }
-    return weekData.value ? [weekData.year, getOrdinalSuffixOf(weekData.value)].join('-') : value
-  }, [value, valueHover, weekData, weekDataHover])
 
   const getDateClassName = (dateMonthType, { year, month, date }) => {
     let initClassName = 'mor-date'
@@ -207,16 +178,6 @@ const Datepicker = ({
       initClassName += ' mor-date-disabled'
     }
     return initClassName
-  }
-
-  const getValueShoot = ({ year, month, date }) => {
-    const _year = getPerfectDate(year)
-    const _month = getPerfectDate(month)
-    const _date = getPerfectDate(date)
-    const valueDate = [_year, _month, _date]
-    return format === FORMAT_FORWARD_SLASH_YYYYMMDD
-      ? valueDate.join('/')
-      : valueDate.reverse().join('/')
   }
 
   const getWeekClassName = (week) => {
@@ -264,9 +225,6 @@ const Datepicker = ({
     }
     if (disabled) {
       initClassName += ' mor-datepicker-disabled'
-    }
-    if (className) {
-      initClassName += ` ${className}`
     }
     return initClassName
   }
@@ -444,31 +402,22 @@ const Datepicker = ({
   }
 
   return (
-    <div className={getRootClassName()} ref={morDatepickerRef} onClick={onShowPickerContainer}>
-      <input
-        className="mor-datepicker-input-value"
-        value={valueView}
-        placeholder={placeholder}
-        readOnly={true}
-      />
+    <div className={`${getRootClassName()} ${className}`} ref={morDatepickerRef} onClick={onShowPickerContainer}>
+      <input className="mor-datepicker-input-value" value={valueView} placeholder={placeholder} readOnly={true} />
       <CalendarIcon className="mor-calendar-icon" />
       {hasShowPicker && (
         <div className="mor-picker-container" ref={morPickerContainerRef}>
           <div className="mor-picker-header">
             <div className="mor-button-previous">
               <button
-                className={`mor-year-button-prev${
-                  isPrevYearDisabled ? ' mor-year-button-prev-disabled' : ''
-                }`}
+                className={`mor-year-button-prev${isPrevYearDisabled ? ' mor-year-button-prev-disabled' : ''}`}
                 onClick={onPreviousYear}
               >
                 <span className="mor-year-button-prev-custom"></span>
               </button>
               {isShowFullCalendar && (
                 <button
-                  className={`mor-month-button-prev${
-                    isPrevMonthDisabled ? ' mor-month-button-prev-disabled' : ''
-                  }`}
+                  className={`mor-month-button-prev${isPrevMonthDisabled ? ' mor-month-button-prev-disabled' : ''}`}
                   onClick={onPreviousMonth}
                 >
                   <span className="mor-month-button-prev-custom"></span>
@@ -478,7 +427,7 @@ const Datepicker = ({
             <div className="mor-picker-month-year">
               {isShowFullCalendar && (
                 <div className="mor-month-value" onClick={onShowMonthPicker}>
-                  {config.months[month - 1]}
+                  {monthLabels[month - 1]}
                 </div>
               )}
               <div className="mor-year-value" onClick={onShowYearPicker}>
@@ -488,32 +437,25 @@ const Datepicker = ({
             <div className="mor-button-next">
               {isShowFullCalendar && (
                 <button
-                  className={`mor-month-button-next${
-                    isNextMonthDisabled ? ' mor-month-button-next-disabled' : ''
-                  }`}
+                  className={`mor-month-button-next${isNextMonthDisabled ? ' mor-month-button-next-disabled' : ''}`}
                   onClick={onNextMonth}
                 >
                   <span className="mor-month-button-next-custom"></span>
                 </button>
               )}
               <button
-                className={`mor-year-button-next${
-                  isNextYearDisabled ? ' mor-year-button-next-disabled' : ''
-                }`}
+                className={`mor-year-button-next${isNextYearDisabled ? ' mor-year-button-next-disabled' : ''}`}
                 onClick={onNextYear}
               >
                 <span className="mor-year-button-next-custom"></span>
               </button>
             </div>
           </div>
-          <div
-            id="mor-picker-main"
-            className={`mor-picker-main${isShowYearPicker ? ' mor-picker-main-year-scroll' : ''}`}
-          >
+          <div id="mor-picker-main" className={`mor-picker-main${isShowYearPicker ? ' mor-picker-main-year-scroll' : ''}`}>
             {isShowFullCalendar && (
               <Fragment>
                 <div className="mor-list-day">
-                  {config.days.map((day) => (
+                  {dayLabels.map((day) => (
                     <div className="mor-day" key={day}>
                       {day}
                     </div>
@@ -547,7 +489,7 @@ const Datepicker = ({
             )}
             {isShowMonthPicker && (
               <MonthPicker
-                months={config.months}
+                months={monthLabels}
                 year={year}
                 value={month}
                 date={date}
@@ -602,6 +544,29 @@ const Datepicker = ({
       )}
     </div>
   )
+}
+
+Datepicker.propTypes = {
+  className: PropTypes.string,
+  picker: PropTypes.oneOf(['date', 'month', 'year', 'week']),
+  placeholder: PropTypes.string,
+  format: PropTypes.string,
+  minDate: PropTypes.string,
+  maxDate: PropTypes.string,
+  dayLabels: PropTypes.array,
+  monthLabels: PropTypes.array,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+}
+
+Datepicker.defaultProps = {
+  className: '',
+  picker: 'date',
+  format: 'YYYY/MM/DD',
+  minDate: '1900/01/01',
+  maxDate: '2100/31/12',
+  dayLabels: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+  monthLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Oct', 'Nov', 'Dec'],
 }
 
 export default Datepicker
