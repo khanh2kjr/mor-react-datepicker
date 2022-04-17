@@ -37,23 +37,14 @@ export const formatDateValue = (value, format) => {
 }
 
 export const setDateDisabled = (minDate, maxDate, format, dateValue) => {
-  const _minDate =
-    format === FORMAT_FORWARD_SLASH_YYYYMMDD ? minDate : minDate.split('/').reverse().join('/')
-  const _maxDate =
-    format === FORMAT_FORWARD_SLASH_YYYYMMDD ? maxDate : maxDate.split('/').reverse().join('/')
+  const _minDate = format === FORMAT_FORWARD_SLASH_YYYYMMDD ? minDate : minDate.split('/').reverse().join('/')
+  const _maxDate = format === FORMAT_FORWARD_SLASH_YYYYMMDD ? maxDate : maxDate.split('/').reverse().join('/')
   const minDateObject = new Date(_minDate)
   const maxDateObject = new Date(_maxDate)
   const valueDateObject = new Date(
-    [
-      getPerfectDate(dateValue.year),
-      getPerfectDate(dateValue.month),
-      getPerfectDate(dateValue.date),
-    ].join('/')
+    [getPerfectDate(dateValue.year), getPerfectDate(dateValue.month), getPerfectDate(dateValue.date)].join('/')
   )
-  return (
-    valueDateObject.getTime() < minDateObject.getTime() ||
-    valueDateObject.getTime() > maxDateObject.getTime()
-  )
+  return valueDateObject.getTime() < minDateObject.getTime() || valueDateObject.getTime() > maxDateObject.getTime()
 }
 
 export const getWeekNumber = (d) => {
@@ -77,4 +68,15 @@ export const getOrdinalSuffixOf = (i) => {
     return i + 'rd'
   }
   return i + 'th'
+}
+
+export const isValidDate = (s) => {
+  // Assumes s is "mm/dd/yyyy"
+  if (!/^\d\d\/\d\d\/\d\d\d\d$/.test(s)) {
+    return false
+  }
+  const parts = s.split('/').map((p) => parseInt(p, 10))
+  parts[0] -= 1
+  const d = new Date(parts[2], parts[0], parts[1])
+  return d.getMonth() === parts[0] && d.getDate() === parts[1] && d.getFullYear() === parts[2]
 }

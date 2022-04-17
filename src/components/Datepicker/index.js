@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, Fragment } from 'react'
+import React, { useState, useMemo, useRef, Fragment, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import MonthPicker from '../MonthPicker'
 import YearPicker from '../YearPicker'
@@ -20,12 +20,25 @@ import {
   getTotalDateFromYearMonth,
   getWeekNumber,
   setDateDisabled,
+  isValidDate,
 } from '../../utils'
 import './style.css'
 
 const Datepicker = (props) => {
-  const { value, picker, disabled, format, placeholder, className, minDate, maxDate, dayLabels, monthLabels, onChange } =
-    props
+  const {
+    value,
+    picker,
+    disabled,
+    format,
+    placeholder,
+    className,
+    minDate,
+    maxDate,
+    dayLabels,
+    monthLabels,
+    onChange,
+    onError,
+  } = props
 
   const [year, setYear] = useState(() => (value ? new Date(formatDateValue(value, format)).getFullYear() : currentYear))
   const [month, setMonth] = useState(() => (value ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth))
@@ -38,6 +51,7 @@ const Datepicker = (props) => {
   const [hasShowPicker, setHasShowPicker] = useState(false)
   const [weekData, setWeekData] = useState({ value: null, date, month, year })
   const [weekDataHover, setWeekDataHover] = useState({ value: null, date, month, year })
+  const [error, setError] = useState(false)
 
   const morDatepickerRef = useRef()
   const morPickerContainerRef = useRef()
@@ -241,6 +255,9 @@ const Datepicker = (props) => {
     if (disabled) {
       initClassName += ' mor-datepicker-disabled'
     }
+    if (error) {
+      initClassName += ' mor-datepicker-error'
+    }
     return initClassName
   }
 
@@ -416,6 +433,35 @@ const Datepicker = (props) => {
     }
   }
 
+  useEffect(() => {
+    const runtimePropValidation = () => {
+      let _value = ''
+      switch (picker) {
+        case 'date':
+          _value = value
+          break
+        case 'month':
+          _value = value + '/01'
+          break
+        case 'year':
+          _value = value + '/01/01'
+          break
+        case 'week':
+          break
+        default:
+      }
+      if (!isValidDate(_value.split('/').reverse().join('/')) && value !== '') {
+        console.error(`Error: Failed value: Invalid prop 'value' of value ${_value} supplied to component.`)
+        setError(true)
+      }
+    }
+    runtimePropValidation()
+  }, [])
+
+  useEffect(() => {
+    onError(error)
+  }, [error])
+
   return (
     <div className={`${getRootClassName()} ${className}`} ref={morDatepickerRef} onClick={onShowPickerContainer}>
       <input className="mor-datepicker-input-value" value={valueView} placeholder={placeholder} readOnly={true} />
@@ -566,17 +612,20 @@ Datepicker.propTypes = {
   picker: PropTypes.oneOf(['date', 'month', 'year', 'week']),
   className: PropTypes.string,
   placeholder: PropTypes.string,
+  disabled: PropTypes.bool,
   format: PropTypes.string,
   minDate: PropTypes.string,
   maxDate: PropTypes.string,
   dayLabels: PropTypes.array,
   monthLabels: PropTypes.array,
   onChange: PropTypes.func.isRequired,
+  onError: PropTypes.func,
 }
 
 Datepicker.defaultProps = {
   className: '',
   picker: 'date',
+  disabled: false,
   format: 'YYYY/MM/DD',
   minDate: '1900/01/01',
   maxDate: '2100/31/12',

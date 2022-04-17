@@ -16,6 +16,15 @@
   transition: all 0.2s;
 }
 
+.mor-datepicker-error {
+  border-color: #dc3545;
+}
+
+.mor-datepicker-error .mor-datepicker-input-value,
+.mor-datepicker-error .mor-calendar-icon {
+  color: #dc3545 !important;
+}
+
 .mor-datepicker-focus,
 .mor-datepicker:hover {
   border-color: #40a9ff;
