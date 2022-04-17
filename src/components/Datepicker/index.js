@@ -562,15 +562,15 @@ const Datepicker = (props) => {
 }
 
 Datepicker.propTypes = {
-  className: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   picker: PropTypes.oneOf(['date', 'month', 'year', 'week']),
+  className: PropTypes.string,
   placeholder: PropTypes.string,
   format: PropTypes.string,
   minDate: PropTypes.string,
   maxDate: PropTypes.string,
   dayLabels: PropTypes.array,
   monthLabels: PropTypes.array,
-  value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
 }
 
