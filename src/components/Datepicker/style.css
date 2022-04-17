@@ -16,8 +16,9 @@
   transition: all 0.2s;
 }
 
-.mor-datepicker-error {
-  border-color: #dc3545;
+.mor-datepicker-error,
+.mor-datepicker-error:hover {
+  border-color: #dc3545 !important;
 }
 
 .mor-datepicker-error .mor-datepicker-input-value,

@@ -463,14 +463,14 @@ const Datepicker = (props) => {
       if ((value !== '' && isInvalidDate) || isNotRangeMatching) {
         console.error(`Error: Failed value: Invalid prop 'value' of value ${_value} supplied to component.`)
         setError(true)
+        !!onError && onError(true)
+      } else {
+        setError(false)
+        !!onError && onError(false)
       }
     }
     runtimePropValidation()
-  }, [])
-
-  useEffect(() => {
-    !!onError && onError(error)
-  }, [error])
+  }, [value])
 
   return (
     <div className={`${getRootClassName()} ${className}`} ref={morDatepickerRef} onClick={onShowPickerContainer}>
