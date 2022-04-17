@@ -451,8 +451,8 @@ const Datepicker = (props) => {
         default:
       }
       const date = new Date(_value)
-      const _year = _date.getFullYear()
-      const _month = _date.getMonth() + 1
+      const _year = date.getFullYear()
+      const _month = date.getMonth() + 1
       const _date = date.getDate()
       if (
         !isValidDate(_value.split('/').reverse().join('/')) &&
