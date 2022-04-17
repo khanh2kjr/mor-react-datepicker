@@ -450,19 +450,17 @@ const Datepicker = (props) => {
           break
         default:
       }
+      const isInvalidDate = !isValidDate(_value.split('/').reverse().join('/'))
       const date = new Date(_value)
       const _year = date.getFullYear()
       const _month = date.getMonth() + 1
       const _date = date.getDate()
-      if (
-        !isValidDate(_value.split('/').reverse().join('/')) &&
-        value !== '' &&
-        setDateDisabled(minDate, maxDate, format, {
-          year: _year,
-          month: _month,
-          date: _date,
-        })
-      ) {
+      const isNotRangeMatching = setDateDisabled(minDate, maxDate, format, {
+        year: _year,
+        month: _month,
+        date: _date,
+      })
+      if ((value !== '' && isInvalidDate) || isNotRangeMatching) {
         console.error(`Error: Failed value: Invalid prop 'value' of value ${_value} supplied to component.`)
         setError(true)
       }
