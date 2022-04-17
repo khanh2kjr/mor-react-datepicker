@@ -469,7 +469,7 @@ const Datepicker = (props) => {
   }, [])
 
   useEffect(() => {
-    onError(error)
+    !!onError && onError(error)
   }, [error])
 
   return (
