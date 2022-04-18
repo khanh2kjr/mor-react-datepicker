@@ -25,20 +25,7 @@ import {
 import './style.css'
 
 const Datepicker = (props) => {
-  const {
-    value,
-    picker,
-    disabled,
-    format,
-    placeholder,
-    className,
-    minDate,
-    maxDate,
-    dayLabels,
-    monthLabels,
-    onChange,
-    onError,
-  } = props
+  const { value, picker, disabled, format, placeholder, className, dayLabels, monthLabels, onChange, onError } = props
 
   const [year, setYear] = useState(() => (value ? new Date(formatDateValue(value, format)).getFullYear() : currentYear))
   const [month, setMonth] = useState(() => (value ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth))
@@ -66,6 +53,18 @@ const Datepicker = (props) => {
     }
     return weekData.value ? [weekData.year, getOrdinalSuffixOf(weekData.value)].join('-') : value
   }, [value, valueHover, weekData, weekDataHover])
+
+  const minDate = useMemo(() => {
+    return picker === 'date' ? props.minDate : '1900/01/01'
+  }, [])
+
+  const maxDate = useMemo(() => {
+    return picker === 'date' ? props.maxDate : '2100/12/31'
+  }, [])
+
+  const isFormatYYYYMMDD = useMemo(() => {
+    return format === FORMAT_FORWARD_SLASH_YYYYMMDD
+  }, [])
 
   const yearStepAction = useMemo(() => {
     return {
@@ -183,7 +182,7 @@ const Datepicker = (props) => {
     const _month = getPerfectDate(month)
     const _date = getPerfectDate(date)
     const valueDate = [_year, _month, _date]
-    return format === FORMAT_FORWARD_SLASH_YYYYMMDD ? valueDate.join('/') : valueDate.reverse().join('/')
+    return isFormatYYYYMMDD ? valueDate.join('/') : valueDate.reverse().join('/')
   }
 
   const getDateClassName = (dateMonthType, { year, month, date }) => {
@@ -434,23 +433,41 @@ const Datepicker = (props) => {
   }
 
   useEffect(() => {
-    const runtimePropValidation = () => {
+    const refactorValuePickerDate = (value) => {
+      const valueSplit = value.split('/')
+      const _year = isFormatYYYYMMDD ? valueSplit[0] : valueSplit[2]
+      const _month = valueSplit[1]
+      const _date = isFormatYYYYMMDD ? valueSplit[2] : valueSplit[0]
+      return [_month, _date, _year].join('/')
+    }
+    const refactorValuePickerMonth = (value) => {
+      const _valueArr = [value, '01']
+      const _value = isFormatYYYYMMDD ? _valueArr.join('/') : _valueArr.reverse().join('/')
+      return refactorValuePickerDate(_value)
+    }
+    const refactorValuePickerYear = (value) => {
+      const _valueArr = [value, '01/01']
+      const _value = isFormatYYYYMMDD ? _valueArr.join('/') : _valueArr.reverse().join('/')
+      return refactorValuePickerDate(_value)
+    }
+    const runtimeValuePropValidation = () => {
+      if (!value) return
       let _value = ''
       switch (picker) {
         case 'date':
-          _value = value
+          _value = refactorValuePickerDate(value)
           break
         case 'month':
-          _value = value + '/01'
+          _value = refactorValuePickerMonth(value)
           break
         case 'year':
-          _value = value + '/01/01'
+          _value = refactorValuePickerYear(value)
           break
         case 'week':
           break
         default:
       }
-      const isInvalidDate = !isValidDate(_value.split('/').reverse().join('/'))
+      const isInvalidDate = !isValidDate(_value)
       const date = new Date(_value)
       const _year = date.getFullYear()
       const _month = date.getMonth() + 1
@@ -460,7 +477,7 @@ const Datepicker = (props) => {
         month: _month,
         date: _date,
       })
-      if ((value !== '' && isInvalidDate) || isNotRangeMatching) {
+      if (isInvalidDate || isNotRangeMatching) {
         console.error(`Error: Failed value: Invalid prop 'value' of value ${_value} supplied to component.`)
         setError(true)
         !!onError && onError(true)
@@ -469,8 +486,8 @@ const Datepicker = (props) => {
         !!onError && onError(false)
       }
     }
-    runtimePropValidation()
-  }, [value])
+    runtimeValuePropValidation()
+  }, [])
 
   return (
     <div className={`${getRootClassName()} ${className}`} ref={morDatepickerRef} onClick={onShowPickerContainer}>
