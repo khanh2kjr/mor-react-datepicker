@@ -1,6 +1,6 @@
 {
   "name": "mor-react-datepicker",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "MOR common component",
   "main": "dist/index.js",
   "module": "dist/index.js",

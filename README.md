@@ -2,6 +2,11 @@
 
 `mor-react-datepicker` is a datepicker ReactJS component.
 
+# Demo
+<https://demo-mor-react-datepicker.vercel.app/>
+
+<img src="./src/images/demo.png" alt="build:passed">
+
 # Getting started
 
 ## Install
@@ -32,10 +37,10 @@ export default MyComponent
 
 | Prop                | Description                                      | Type                                            | Default        |
 | ------------------- | ------------------------------------------------ | ----------------------------------------------- | -------------- |
-| value               | default value => '', week value format [yyyy/mm] | `string|number|array`                           |                |
-| placeholder         | placeholder text                                 | `string`                                        | ''             |
+| value               | default value => '', week value format [yyyy/mm] | `string number array`                           | -------------- |
+| placeholder         | placeholder text                                 | `string`                                        | -------------- |
 | picker              | type picker                                      | `string`                                        | 'date'         |
-| format              | YYYY/MM/DD | DD/MM/YYYY                          | `string`                                        | 'YYYY/MM/DD'   |
+| format              | YYYY/MM/DD or DD/MM/YYYY                         | `string`                                        | 'YYYY/MM/DD'   |
 | disabled            | ------------------------------------------------ | `boolean`                                       | false          |
 | dayLabels           | String array: length 7                           | `array`                                         | -------------- |
 | monthLabels         | String array: length 12                          | `array`                                         | -------------- |
