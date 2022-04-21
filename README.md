@@ -38,18 +38,16 @@ export default MyComponent
 | Prop                | Description                                      | Type                                            | Default        |
 | ------------------- | ------------------------------------------------ | ----------------------------------------------- | -------------- |
 | value               | default value => '', week value format [yyyy/mm] | `string number array`                           | -------------- |
+| onChange            | callback function                                | `func`                                          | -------------- |
 | placeholder         | placeholder text                                 | `string`                                        | -------------- |
 | picker              | type picker                                      | `string`                                        | 'date'         |
 | format              | YYYY/MM/DD or DD/MM/YYYY                         | `string`                                        | 'YYYY/MM/DD'   |
 | disabled            | ------------------------------------------------ | `boolean`                                       | false          |
-| dayLabels           | String array: length 7                           | `array`                                         | -------------- |
-| monthLabels         | String array: length 12                          | `array`                                         | -------------- |
-| onChange            | callback function                                | `func`                                          | -------------- |
 | minDate             | ------------------------------------------------ | `string`                                        | '1900/01/01'   |
 | minDate             | ------------------------------------------------ | `string`                                        | '2100/12/31'   |
 
 ## License
 
-Copyright (c) 2022 Khanh Nguyen.
+Copyright (c) 2022 Khanh Nguyen - MOR Software JSC.
 
 Licensed under The MIT License (MIT).

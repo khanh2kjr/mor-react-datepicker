@@ -10,6 +10,8 @@ import {
   currentMonth,
   currentDate,
   FORMAT_FORWARD_SLASH_YYYYMMDD,
+  DAY_LABELS,
+  MONTH_LABELS,
 } from '../../constants'
 import { useClickOutside } from '../../hooks'
 import {
@@ -41,8 +43,6 @@ const Datepicker = (props) => {
     format,
     placeholder,
     className,
-    dayLabels,
-    monthLabels,
     onChange,
     onError,
   } = props
@@ -507,7 +507,7 @@ const Datepicker = (props) => {
             <div className="mor-picker-month-year">
               {isShowFullCalendar && (
                 <div className="mor-month-value" onClick={onShowMonthPicker}>
-                  {monthLabels[month - 1]}
+                  {MONTH_LABELS[month - 1]}
                 </div>
               )}
               <div className="mor-year-value" onClick={onShowYearPicker}>
@@ -544,7 +544,7 @@ const Datepicker = (props) => {
             {isShowFullCalendar && (
               <Fragment>
                 <div className="mor-list-day">
-                  {dayLabels.map((day) => (
+                  {DAY_LABELS.map((day) => (
                     <div className="mor-day" key={day}>
                       {day}
                     </div>
@@ -603,7 +603,7 @@ const Datepicker = (props) => {
             )}
             {isShowMonthPicker && (
               <MonthPicker
-                months={monthLabels}
+                months={MONTH_LABELS}
                 year={year}
                 value={month}
                 date={date}
@@ -673,8 +673,6 @@ Datepicker.propTypes = {
   format: PropTypes.string,
   minDate: PropTypes.string,
   maxDate: PropTypes.string,
-  dayLabels: PropTypes.array,
-  monthLabels: PropTypes.array,
   onChange: PropTypes.func.isRequired,
   onError: PropTypes.func,
 }
@@ -686,21 +684,6 @@ Datepicker.defaultProps = {
   format: 'YYYY/MM/DD',
   minDate: '1900/01/01',
   maxDate: '2100/31/12',
-  dayLabels: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-  monthLabels: [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ],
 }
 
 export default Datepicker

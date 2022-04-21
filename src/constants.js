@@ -12,3 +12,19 @@ export const DATE_MONTH_TYPE = {
 }
 
 export const MATRIX_CALENDAR_TOTAL = 42
+
+export const DAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+export const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
