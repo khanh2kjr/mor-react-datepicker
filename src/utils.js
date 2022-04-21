@@ -80,3 +80,7 @@ export const isValidDate = (s) => {
   const d = new Date(parts[2], parts[0], parts[1])
   return d.getMonth() === parts[0] && d.getDate() === parts[1] && d.getFullYear() === parts[2]
 }
+
+export const getDateOfWeek = (weekNumber, year) => {
+  return new Date(year, 0, 1 + weekNumber * 7)
+}

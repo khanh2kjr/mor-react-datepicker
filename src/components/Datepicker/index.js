@@ -21,22 +21,29 @@ import {
   getWeekNumber,
   setDateDisabled,
   isValidDate,
+  getDateOfWeek,
 } from '../../utils'
 import './style.css'
 
 const Datepicker = (props) => {
   const { value, picker, disabled, format, placeholder, className, dayLabels, monthLabels, onChange, onError } = props
 
-  const [year, setYear] = useState(() => (value ? new Date(formatDateValue(value, format)).getFullYear() : currentYear))
-  const [month, setMonth] = useState(() => (value ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth))
-  const [date, setDate] = useState(() => (value ? new Date(formatDateValue(value, format)).getDate() : currentDate))
+  const [year, setYear] = useState(() =>
+    value && picker !== 'week' ? new Date(formatDateValue(value, format)).getFullYear() : currentYear
+  )
+  const [month, setMonth] = useState(() =>
+    value && picker !== 'week' ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth
+  )
+  const [date, setDate] = useState(() =>
+    value && picker !== 'week' ? new Date(formatDateValue(value, format)).getDate() : currentDate
+  )
   const [isShowDatepicker, setIsShowDatepicker] = useState(() => picker === 'date')
   const [isShowYearPicker, setIsShowYearPicker] = useState(() => picker === 'year')
   const [isShowWeekPicker, setIsShowWeekPicker] = useState(() => picker === 'week')
   const [isShowMonthPicker, setIsShowMonthPicker] = useState(() => picker === 'month')
   const [valueHover, setValueHover] = useState('')
   const [hasShowPicker, setHasShowPicker] = useState(false)
-  const [weekData, setWeekData] = useState({ value: null, date, month, year })
+  const [weekData, setWeekData] = useState({ value: picker === 'week' ? value[1] : null, date, month, year })
   const [weekDataHover, setWeekDataHover] = useState({ value: null, date, month, year })
   const [error, setError] = useState(false)
 
@@ -213,13 +220,17 @@ const Datepicker = (props) => {
     if (isShowWeekPicker) {
       initClassName += ' mor-week-picker'
     }
-    if (
-      week[3].value.year === weekData.year &&
-      week[3].value.month === weekData.month &&
-      week[3].value.date === weekData.date &&
-      weekData.value &&
-      picker === 'week'
-    ) {
+    const isWeekPicker = weekData.value && picker === 'week'
+    const isWeekSelected =
+      week[3].value.year === weekData.year && week[3].value.month === weekData.month && week[3].value.date === weekData.date
+    const isWeekValuePropSelected =
+      week.findIndex(
+        (dateValue) =>
+          dateValue.value.date === weekData.date &&
+          dateValue.value.month === weekData.month &&
+          dateValue.value.year === weekData.year
+      ) !== -1
+    if (isWeekPicker && (isWeekSelected || isWeekValuePropSelected)) {
       initClassName += ' mor-week-selected'
     }
     if (
@@ -336,6 +347,11 @@ const Datepicker = (props) => {
     setHasShowPicker(false)
     setYear(currentYear)
     setMonth(currentMonth)
+    setDate(currentDate)
+    setWeekData((currentWeekDataState) => ({
+      ...currentWeekDataState,
+      value: null,
+    }))
     onChange('')
   }
 
@@ -410,7 +426,7 @@ const Datepicker = (props) => {
   const onPickWeek = (eventName, dateValue) => {
     const val = getValueShoot(dateValue.value)
     const yearWeek = getWeekNumber(new Date(val))
-    const valWeek = [getPerfectDate(yearWeek[0]), getPerfectDate(yearWeek[1])].join('/')
+    const valWeek = [yearWeek[0], yearWeek[1]]
     if (picker === 'week' && eventName === 'onClick') {
       setWeekData({
         value: yearWeek[1],
@@ -450,6 +466,22 @@ const Datepicker = (props) => {
       const _value = isFormatYYYYMMDD ? _valueArr.join('/') : _valueArr.reverse().join('/')
       return refactorValuePickerDate(_value)
     }
+    const refactorValuePickerWeek = (value) => {
+      const dateObjectFromWeek = getDateOfWeek(value[1], value[0])
+      const _year = getPerfectDate(dateObjectFromWeek.getFullYear())
+      const _month = getPerfectDate(dateObjectFromWeek.getMonth() + 1)
+      const _date = getPerfectDate(dateObjectFromWeek.getDate())
+      setWeekData({
+        value: value[1],
+        year: Number(_year),
+        month: Number(_month),
+        date: Number(_date),
+      })
+      setYear(Number(_year))
+      setMonth(Number(_month))
+      setDate(Number(_date))
+      return [_month, _date, _year].join('/')
+    }
     const runtimeValuePropValidation = () => {
       if (!value) return
       let _value = ''
@@ -464,6 +496,7 @@ const Datepicker = (props) => {
           _value = refactorValuePickerYear(value)
           break
         case 'week':
+          _value = refactorValuePickerWeek(value)
           break
         default:
       }
@@ -635,7 +668,7 @@ const Datepicker = (props) => {
 }
 
 Datepicker.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   picker: PropTypes.oneOf(['date', 'month', 'year', 'week']),
   className: PropTypes.string,
   placeholder: PropTypes.string,
