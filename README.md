@@ -24,24 +24,24 @@ const MyComponent = () => {
     setValue(newValue)
   }
 
-  return (
-    <Datepicker
-      picker="date"
-      placeholder="Select date"
-      format="YYYY/MM/DD"
-      minDate="2011/08/22"
-      maxDate="2022/10/27"
-      disabled={false}
-      dayLabels={['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']}
-      monthLabels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Oct', 'Nov', 'Dec']}
-      value={value}
-      onChange={handleValueChange}
-    />
-  )
+  return <Datepicker value={value} onChange={handleValueChange} />
 }
 
 export default MyComponent
 ```
+
+| Prop                | Description                                      | Type                                            | Default        |
+| ------------------- | ------------------------------------------------ | ----------------------------------------------- | -------------- |
+| value               | default value => '', week value format [yyyy/mm] | `string|number|array`                           |                |
+| placeholder         | placeholder text                                 | `string`                                        | ''             |
+| picker              | type picker                                      | `string`                                        | 'date'         |
+| format              | YYYY/MM/DD | DD/MM/YYYY                          | `string`                                        | 'YYYY/MM/DD'   |
+| disabled            | ------------------------------------------------ | `boolean`                                       | false          |
+| dayLabels           | String array: length 7                           | `array`                                         | -------------- |
+| monthLabels         | String array: length 12                          | `array`                                         | -------------- |
+| onChange            | callback function                                | `func`                                          | -------------- |
+| minDate             | ------------------------------------------------ | `string`                                        | '1900/01/01'   |
+| minDate             | ------------------------------------------------ | `string`                                        | '2100/12/31'   |
 
 ## License
 
