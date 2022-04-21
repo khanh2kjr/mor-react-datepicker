@@ -62,18 +62,10 @@ const Datepicker = (props) => {
       ? new Date(formatDateValue(value, format)).getDate()
       : currentDate
   )
-  const [isShowDatepicker, setIsShowDatepicker] = useState(
-    () => picker === 'date'
-  )
-  const [isShowYearPicker, setIsShowYearPicker] = useState(
-    () => picker === 'year'
-  )
-  const [isShowWeekPicker, setIsShowWeekPicker] = useState(
-    () => picker === 'week'
-  )
-  const [isShowMonthPicker, setIsShowMonthPicker] = useState(
-    () => picker === 'month'
-  )
+  const [isShowDatepicker, setIsShowDatepicker] = useState(picker === 'date')
+  const [isShowYearPicker, setIsShowYearPicker] = useState(picker === 'year')
+  const [isShowWeekPicker, setIsShowWeekPicker] = useState(picker === 'week')
+  const [isShowMonthPicker, setIsShowMonthPicker] = useState(picker === 'month')
   const [valueHover, setValueHover] = useState('')
   const [hasShowPicker, setHasShowPicker] = useState(false)
   const [weekData, setWeekData] = useState({
