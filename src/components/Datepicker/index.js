@@ -22,29 +22,72 @@ import {
   setDateDisabled,
   isValidDate,
   getDateOfWeek,
+  getValueShoot,
+  getRootDatepickerClassName,
+  getDateClassName,
+  getWeekClassName,
+  refactorValuePickerDate,
+  refactorValuePickerMonth,
+  refactorValuePickerYear,
+  refactorValuePickerWeek,
 } from '../../utils'
 import './style.css'
 
 const Datepicker = (props) => {
-  const { value, picker, disabled, format, placeholder, className, dayLabels, monthLabels, onChange, onError } = props
+  const {
+    value,
+    picker,
+    disabled,
+    format,
+    placeholder,
+    className,
+    dayLabels,
+    monthLabels,
+    onChange,
+    onError,
+  } = props
 
   const [year, setYear] = useState(() =>
-    value && picker !== 'week' ? new Date(formatDateValue(value, format)).getFullYear() : currentYear
+    value && picker !== 'week'
+      ? new Date(formatDateValue(value, format)).getFullYear()
+      : currentYear
   )
   const [month, setMonth] = useState(() =>
-    value && picker !== 'week' ? new Date(formatDateValue(value, format)).getMonth() + 1 : currentMonth
+    value && picker !== 'week'
+      ? new Date(formatDateValue(value, format)).getMonth() + 1
+      : currentMonth
   )
   const [date, setDate] = useState(() =>
-    value && picker !== 'week' ? new Date(formatDateValue(value, format)).getDate() : currentDate
+    value && picker !== 'week'
+      ? new Date(formatDateValue(value, format)).getDate()
+      : currentDate
   )
-  const [isShowDatepicker, setIsShowDatepicker] = useState(() => picker === 'date')
-  const [isShowYearPicker, setIsShowYearPicker] = useState(() => picker === 'year')
-  const [isShowWeekPicker, setIsShowWeekPicker] = useState(() => picker === 'week')
-  const [isShowMonthPicker, setIsShowMonthPicker] = useState(() => picker === 'month')
+  const [isShowDatepicker, setIsShowDatepicker] = useState(
+    () => picker === 'date'
+  )
+  const [isShowYearPicker, setIsShowYearPicker] = useState(
+    () => picker === 'year'
+  )
+  const [isShowWeekPicker, setIsShowWeekPicker] = useState(
+    () => picker === 'week'
+  )
+  const [isShowMonthPicker, setIsShowMonthPicker] = useState(
+    () => picker === 'month'
+  )
   const [valueHover, setValueHover] = useState('')
   const [hasShowPicker, setHasShowPicker] = useState(false)
-  const [weekData, setWeekData] = useState({ value: picker === 'week' ? value[1] : null, date, month, year })
-  const [weekDataHover, setWeekDataHover] = useState({ value: null, date, month, year })
+  const [weekData, setWeekData] = useState({
+    value: picker === 'week' && value.length ? value[1] : null,
+    date,
+    month,
+    year,
+  })
+  const [weekDataHover, setWeekDataHover] = useState({
+    value: null,
+    date,
+    month,
+    year,
+  })
   const [error, setError] = useState(false)
 
   const morDatepickerRef = useRef()
@@ -56,9 +99,15 @@ const Datepicker = (props) => {
 
   const valueView = useMemo(() => {
     if (valueHover || weekDataHover.value) {
-      return weekDataHover.value ? [weekDataHover.year, getOrdinalSuffixOf(weekDataHover.value)].join('-') : valueHover
+      return weekDataHover.value
+        ? [weekDataHover.year, getOrdinalSuffixOf(weekDataHover.value)].join(
+            '-'
+          )
+        : valueHover
     }
-    return weekData.value ? [weekData.year, getOrdinalSuffixOf(weekData.value)].join('-') : value
+    return weekData.value
+      ? [weekData.year, getOrdinalSuffixOf(weekData.value)].join('-')
+      : value
   }, [value, valueHover, weekData, weekDataHover])
 
   const minDate = useMemo(() => {
@@ -95,7 +144,10 @@ const Datepicker = (props) => {
 
   const datesOldMonth = useMemo(() => {
     const result = []
-    const countDateOldMonth = getTotalDateFromYearMonth(yearStepAction.prev, monthStepAction.prev)
+    const countDateOldMonth = getTotalDateFromYearMonth(
+      yearStepAction.prev,
+      monthStepAction.prev
+    )
     const dateFirstCalendar = countDateOldMonth - (firstDayOfMonth - 1)
     for (let i = dateFirstCalendar; i <= countDateOldMonth; i++) {
       result.push({
@@ -128,8 +180,13 @@ const Datepicker = (props) => {
 
   const datesFutureMonth = useMemo(() => {
     const result = []
-    const countDateOldMonthAndCurrentMonth = datesOldMonth.length + datesCurrentMonth.length
-    for (let i = 1; i <= MATRIX_CALENDAR_TOTAL - countDateOldMonthAndCurrentMonth; i++) {
+    const countDateOldMonthAndCurrentMonth =
+      datesOldMonth.length + datesCurrentMonth.length
+    for (
+      let i = 1;
+      i <= MATRIX_CALENDAR_TOTAL - countDateOldMonthAndCurrentMonth;
+      i++
+    ) {
       result.push({
         dateMonthType: DATE_MONTH_TYPE.FUTURE_MONTH,
         value: {
@@ -143,7 +200,10 @@ const Datepicker = (props) => {
   }, [yearStepAction, monthStepAction, datesOldMonth, datesCurrentMonth])
 
   const weeks = useMemo(() => {
-    return chunkArray([...datesOldMonth, ...datesCurrentMonth, ...datesFutureMonth], 7)
+    return chunkArray(
+      [...datesOldMonth, ...datesCurrentMonth, ...datesFutureMonth],
+      7
+    )
   }, [datesOldMonth, datesCurrentMonth, datesFutureMonth])
 
   const isPrevYearDisabled = useMemo(() => {
@@ -183,93 +243,6 @@ const Datepicker = (props) => {
   const isShowFullCalendar = useMemo(() => {
     return isShowDatepicker || isShowWeekPicker
   }, [isShowDatepicker, isShowWeekPicker])
-
-  const getValueShoot = ({ year, month, date }) => {
-    const _year = getPerfectDate(year)
-    const _month = getPerfectDate(month)
-    const _date = getPerfectDate(date)
-    const valueDate = [_year, _month, _date]
-    return isFormatYYYYMMDD ? valueDate.join('/') : valueDate.reverse().join('/')
-  }
-
-  const getDateClassName = (dateMonthType, { year, month, date }) => {
-    let initClassName = 'mor-date'
-    if (dateMonthType !== DATE_MONTH_TYPE.CURRENT_MONTH) {
-      initClassName += ' mor-date-old-future'
-    }
-    const valueDateLocal = getValueShoot({ year, month, date })
-    const valueDateToday = getValueShoot({
-      year: currentYear,
-      month: currentMonth,
-      date: currentDate,
-    })
-    if (valueDateLocal === value) {
-      initClassName += ' mor-date-selected'
-    }
-    if (valueDateLocal === valueDateToday) {
-      initClassName += ' mor-date-today'
-    }
-    if (setDateDisabled(minDate, maxDate, format, { year, month, date })) {
-      initClassName += ' mor-date-disabled'
-    }
-    return initClassName
-  }
-
-  const getWeekClassName = (week) => {
-    let initClassName = 'mor-week'
-    if (isShowWeekPicker) {
-      initClassName += ' mor-week-picker'
-    }
-    const isWeekPicker = weekData.value && picker === 'week'
-    const isWeekSelected =
-      week[3].value.year === weekData.year && week[3].value.month === weekData.month && week[3].value.date === weekData.date
-    const isWeekValuePropSelected =
-      week.findIndex(
-        (dateValue) =>
-          dateValue.value.date === weekData.date &&
-          dateValue.value.month === weekData.month &&
-          dateValue.value.year === weekData.year
-      ) !== -1
-    if (isWeekPicker && (isWeekSelected || isWeekValuePropSelected)) {
-      initClassName += ' mor-week-selected'
-    }
-    if (
-      week.findIndex(
-        (dateValue) =>
-          dateValue.value.year === currentYear &&
-          dateValue.value.month === currentMonth &&
-          dateValue.value.date === currentDate
-      ) !== -1 &&
-      picker === 'week'
-    ) {
-      initClassName += ' mor-week-current'
-    }
-    if (
-      setDateDisabled(minDate, maxDate, format, {
-        year: week[0].value.year,
-        month: week[0].value.month,
-        date: week[0].value.date,
-      }) &&
-      picker === 'week'
-    ) {
-      initClassName += ' mor-week-disabled'
-    }
-    return initClassName
-  }
-
-  const getRootClassName = () => {
-    let initClassName = 'mor-datepicker'
-    if (hasShowPicker) {
-      initClassName += ' mor-datepicker-focus'
-    }
-    if (disabled) {
-      initClassName += ' mor-datepicker-disabled'
-    }
-    if (error) {
-      initClassName += ' mor-datepicker-error'
-    }
-    return initClassName
-  }
 
   const onShowPickerContainer = () => {
     if (!hasShowPicker && !disabled) {
@@ -327,7 +300,7 @@ const Datepicker = (props) => {
   }
 
   const onPickToday = (eventName) => {
-    const valueDate = getValueShoot({
+    const valueDate = getValueShoot(format, {
       year: currentYear,
       month: currentMonth,
       date: currentDate,
@@ -356,7 +329,7 @@ const Datepicker = (props) => {
   }
 
   const onDateChange = (eventName, { year, month, date }) => {
-    const valueDate = getValueShoot({
+    const valueDate = getValueShoot(format, {
       year,
       month,
       date,
@@ -424,7 +397,7 @@ const Datepicker = (props) => {
   }
 
   const onPickWeek = (eventName, dateValue) => {
-    const val = getValueShoot(dateValue.value)
+    const val = getValueShoot(format, dateValue.value)
     const yearWeek = getWeekNumber(new Date(val))
     const valWeek = [yearWeek[0], yearWeek[1]]
     if (picker === 'week' && eventName === 'onClick') {
@@ -439,7 +412,8 @@ const Datepicker = (props) => {
       onChange(valWeek)
     }
     if (picker === 'week') {
-      eventName === 'onMouseOut' && setWeekDataHover({ value: null, date, month, year })
+      eventName === 'onMouseOut' &&
+        setWeekDataHover({ value: null, date, month, year })
       eventName === 'onMouseOver' &&
         setWeekDataHover({
           value: yearWeek[1],
@@ -449,54 +423,27 @@ const Datepicker = (props) => {
   }
 
   useEffect(() => {
-    const refactorValuePickerDate = (value) => {
-      const valueSplit = value.split('/')
-      const _year = isFormatYYYYMMDD ? valueSplit[0] : valueSplit[2]
-      const _month = valueSplit[1]
-      const _date = isFormatYYYYMMDD ? valueSplit[2] : valueSplit[0]
-      return [_month, _date, _year].join('/')
-    }
-    const refactorValuePickerMonth = (value) => {
-      const _valueArr = [value, '01']
-      const _value = isFormatYYYYMMDD ? _valueArr.join('/') : _valueArr.reverse().join('/')
-      return refactorValuePickerDate(_value)
-    }
-    const refactorValuePickerYear = (value) => {
-      const _valueArr = [value, '01/01']
-      const _value = isFormatYYYYMMDD ? _valueArr.join('/') : _valueArr.reverse().join('/')
-      return refactorValuePickerDate(_value)
-    }
-    const refactorValuePickerWeek = (value) => {
-      const dateObjectFromWeek = getDateOfWeek(value[1], value[0])
-      const _year = getPerfectDate(dateObjectFromWeek.getFullYear())
-      const _month = getPerfectDate(dateObjectFromWeek.getMonth() + 1)
-      const _date = getPerfectDate(dateObjectFromWeek.getDate())
-      setWeekData({
-        value: value[1],
-        year: Number(_year),
-        month: Number(_month),
-        date: Number(_date),
-      })
-      setYear(Number(_year))
-      setMonth(Number(_month))
-      setDate(Number(_date))
-      return [_month, _date, _year].join('/')
-    }
     const runtimeValuePropValidation = () => {
       if (!value) return
       let _value = ''
       switch (picker) {
         case 'date':
-          _value = refactorValuePickerDate(value)
+          _value = refactorValuePickerDate(value, isFormatYYYYMMDD)
           break
         case 'month':
-          _value = refactorValuePickerMonth(value)
+          _value = refactorValuePickerMonth(value, isFormatYYYYMMDD)
           break
         case 'year':
-          _value = refactorValuePickerYear(value)
+          _value = refactorValuePickerYear(value, isFormatYYYYMMDD)
           break
         case 'week':
-          _value = refactorValuePickerWeek(value)
+          _value = refactorValuePickerWeek(
+            value,
+            setWeekData,
+            setYear,
+            setMonth,
+            setDate
+          )
           break
         default:
       }
@@ -511,7 +458,9 @@ const Datepicker = (props) => {
         date: _date,
       })
       if (isInvalidDate || isNotRangeMatching) {
-        console.error(`Error: Failed value: Invalid prop 'value' of value ${_value} supplied to component.`)
+        console.error(
+          `Error: Failed value: Invalid prop 'value' of value ${_value} supplied to component.`
+        )
         setError(true)
         !!onError && onError(true)
       } else {
@@ -523,22 +472,40 @@ const Datepicker = (props) => {
   }, [])
 
   return (
-    <div className={`${getRootClassName()} ${className}`} ref={morDatepickerRef} onClick={onShowPickerContainer}>
-      <input className="mor-datepicker-input-value" value={valueView} placeholder={placeholder} readOnly={true} />
+    <div
+      className={getRootDatepickerClassName(
+        hasShowPicker,
+        disabled,
+        error,
+        className
+      )}
+      ref={morDatepickerRef}
+      onClick={onShowPickerContainer}
+    >
+      <input
+        className="mor-datepicker-input-value"
+        value={valueView}
+        placeholder={placeholder}
+        readOnly={true}
+      />
       <CalendarIcon className="mor-calendar-icon" />
       {hasShowPicker && (
         <div className="mor-picker-container" ref={morPickerContainerRef}>
           <div className="mor-picker-header">
             <div className="mor-button-previous">
               <button
-                className={`mor-year-button-prev${isPrevYearDisabled ? ' mor-year-button-prev-disabled' : ''}`}
+                className={`mor-year-button-prev${
+                  isPrevYearDisabled ? ' mor-year-button-prev-disabled' : ''
+                }`}
                 onClick={onPreviousYear}
               >
                 <span className="mor-year-button-prev-custom"></span>
               </button>
               {isShowFullCalendar && (
                 <button
-                  className={`mor-month-button-prev${isPrevMonthDisabled ? ' mor-month-button-prev-disabled' : ''}`}
+                  className={`mor-month-button-prev${
+                    isPrevMonthDisabled ? ' mor-month-button-prev-disabled' : ''
+                  }`}
                   onClick={onPreviousMonth}
                 >
                   <span className="mor-month-button-prev-custom"></span>
@@ -558,21 +525,30 @@ const Datepicker = (props) => {
             <div className="mor-button-next">
               {isShowFullCalendar && (
                 <button
-                  className={`mor-month-button-next${isNextMonthDisabled ? ' mor-month-button-next-disabled' : ''}`}
+                  className={`mor-month-button-next${
+                    isNextMonthDisabled ? ' mor-month-button-next-disabled' : ''
+                  }`}
                   onClick={onNextMonth}
                 >
                   <span className="mor-month-button-next-custom"></span>
                 </button>
               )}
               <button
-                className={`mor-year-button-next${isNextYearDisabled ? ' mor-year-button-next-disabled' : ''}`}
+                className={`mor-year-button-next${
+                  isNextYearDisabled ? ' mor-year-button-next-disabled' : ''
+                }`}
                 onClick={onNextYear}
               >
                 <span className="mor-year-button-next-custom"></span>
               </button>
             </div>
           </div>
-          <div id="mor-picker-main" className={`mor-picker-main${isShowYearPicker ? ' mor-picker-main-year-scroll' : ''}`}>
+          <div
+            id="mor-picker-main"
+            className={`mor-picker-main${
+              isShowYearPicker ? ' mor-picker-main-year-scroll' : ''
+            }`}
+          >
             {isShowFullCalendar && (
               <Fragment>
                 <div className="mor-list-day">
@@ -585,7 +561,15 @@ const Datepicker = (props) => {
                 <div className="mor-list-date">
                   {weeks.map((week, index) => (
                     <div
-                      className={getWeekClassName(week)}
+                      className={getWeekClassName(
+                        week,
+                        weekData,
+                        format,
+                        picker,
+                        minDate,
+                        maxDate,
+                        isShowWeekPicker
+                      )}
                       key={index}
                       onClick={() => onPickWeek('onClick', week[3])}
                       onMouseOver={() => onPickWeek('onMouseOver', week[3])}
@@ -593,12 +577,29 @@ const Datepicker = (props) => {
                     >
                       {week.map((dateObject, index) => (
                         <div
-                          className={getDateClassName(dateObject.dateMonthType, dateObject.value)}
-                          title={picker === 'date' ? getValueShoot(dateObject.value) : null}
+                          className={getDateClassName(
+                            value,
+                            format,
+                            minDate,
+                            maxDate,
+                            dateObject.dateMonthType,
+                            dateObject.value
+                          )}
+                          title={
+                            picker === 'date'
+                              ? getValueShoot(format, dateObject.value)
+                              : null
+                          }
                           key={index}
-                          onClick={() => onDateChange('onClick', dateObject.value)}
-                          onMouseOver={() => onDateChange('onMouseOver', dateObject.value)}
-                          onMouseOut={() => onDateChange('onMouseOut', dateObject.value)}
+                          onClick={() =>
+                            onDateChange('onClick', dateObject.value)
+                          }
+                          onMouseOver={() =>
+                            onDateChange('onMouseOver', dateObject.value)
+                          }
+                          onMouseOut={() =>
+                            onDateChange('onMouseOut', dateObject.value)
+                          }
                         >
                           {dateObject.value.date}
                         </div>
@@ -648,7 +649,7 @@ const Datepicker = (props) => {
               isShowDatepicker && (
                 <div
                   className="mor-today"
-                  title={getValueShoot({
+                  title={getValueShoot(format, {
                     year: currentYear,
                     month: currentMonth,
                     date: currentDate,
@@ -668,7 +669,11 @@ const Datepicker = (props) => {
 }
 
 Datepicker.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.array,
+  ]),
   picker: PropTypes.oneOf(['date', 'month', 'year', 'week']),
   className: PropTypes.string,
   placeholder: PropTypes.string,
@@ -690,7 +695,20 @@ Datepicker.defaultProps = {
   minDate: '1900/01/01',
   maxDate: '2100/31/12',
   dayLabels: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
-  monthLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+  monthLabels: [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ],
 }
 
 export default Datepicker
