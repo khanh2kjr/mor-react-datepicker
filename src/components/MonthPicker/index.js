@@ -3,7 +3,17 @@ import { setDateDisabled } from '../../utils'
 import './style.css'
 
 const MonthPicker = (props) => {
-  const { months, value, year, minDate, maxDate, format, date, valueGlobal, onChange } = props
+  const {
+    months,
+    value,
+    year,
+    minDate,
+    maxDate,
+    format,
+    date,
+    valueGlobal,
+    onChange,
+  } = props
 
   const getMonthClassName = (year, month) => {
     let initClassName = 'mor-month'

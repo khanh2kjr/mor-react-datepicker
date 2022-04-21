@@ -4,7 +4,16 @@ import { currentYear } from '../../constants'
 import './style.css'
 
 const YearPicker = (props) => {
-  const { value, valueGlobal, month, date, minDate, maxDate, format, onChange } = props
+  const {
+    value,
+    valueGlobal,
+    month,
+    date,
+    minDate,
+    maxDate,
+    format,
+    onChange,
+  } = props
 
   const listYears = useMemo(() => {
     const result = []
@@ -22,7 +31,9 @@ const YearPicker = (props) => {
     if (yearItem === currentYear) {
       initClassName += ' mor-year-current'
     }
-    if (setDateDisabled(minDate, maxDate, format, { year: yearItem, month, date })) {
+    if (
+      setDateDisabled(minDate, maxDate, format, { year: yearItem, month, date })
+    ) {
       initClassName += ' mor-year-disabled'
     }
     return initClassName
