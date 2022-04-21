@@ -220,13 +220,17 @@ const Datepicker = (props) => {
     if (isShowWeekPicker) {
       initClassName += ' mor-week-picker'
     }
-    if (
-      week[3].value.year === weekData.year &&
-      week[3].value.month === weekData.month &&
-      week[3].value.date === weekData.date &&
-      weekData.value &&
-      picker === 'week'
-    ) {
+    const isWeekPicker = weekData.value && picker === 'week'
+    const isWeekSelected =
+      week[3].value.year === weekData.year && week[3].value.month === weekData.month && week[3].value.date === weekData.date
+    const isWeekValuePropSelected =
+      week.findIndex(
+        (dateValue) =>
+          dateValue.value.date === weekData.date &&
+          dateValue.value.month === weekData.month &&
+          dateValue.value.year === weekData.year
+      ) !== -1
+    if (isWeekPicker && (isWeekSelected || isWeekValuePropSelected)) {
       initClassName += ' mor-week-selected'
     }
     if (
@@ -493,7 +497,6 @@ const Datepicker = (props) => {
           break
         case 'week':
           _value = refactorValuePickerWeek(value)
-          console.log(_value)
           break
         default:
       }
@@ -665,7 +668,7 @@ const Datepicker = (props) => {
 }
 
 Datepicker.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
   picker: PropTypes.oneOf(['date', 'month', 'year', 'week']),
   className: PropTypes.string,
   placeholder: PropTypes.string,
