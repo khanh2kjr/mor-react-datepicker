@@ -38,13 +38,15 @@ export default MyComponent
 | Prop                | Description                                      | Type                                            | Default        |
 | ------------------- | ------------------------------------------------ | ----------------------------------------------- | -------------- |
 | value               | default value => '', week value format [yyyy,mm] | `string number array`                           | -------------- |
-| onChange            | callback function                                | `func`                                          | -------------- |
+| onChange            | callback func - get new value from Datepicker    | `func`                                          | -------------- |
+| onError             | callback func - get error from Datepicker        | `func`                                          | -------------- |
 | placeholder         | placeholder text                                 | `string`                                        | -------------- |
 | picker              | type picker                                      | `string`                                        | 'date'         |
 | format              | YYYY/MM/DD or DD/MM/YYYY                         | `string`                                        | 'YYYY/MM/DD'   |
 | disabled            | ------------------------------------------------ | `boolean`                                       | false          |
 | minDate             | ------------------------------------------------ | `string`                                        | '1900/01/01'   |
 | maxDate             | ------------------------------------------------ | `string`                                        | '2100/12/31'   |
+| sx                  | custom style - example: sx={{ width: 150 }}      | `object`                                        | -------------- |
 
 ## License
 

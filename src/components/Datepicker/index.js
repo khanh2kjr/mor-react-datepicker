@@ -43,6 +43,7 @@ const Datepicker = (props) => {
     format,
     placeholder,
     className,
+    sx,
     onChange,
     onError,
   } = props
@@ -471,6 +472,7 @@ const Datepicker = (props) => {
         error,
         className
       )}
+      style={{ ...sx }}
       ref={morDatepickerRef}
       onClick={onShowPickerContainer}
     >
@@ -673,6 +675,7 @@ Datepicker.propTypes = {
   format: PropTypes.string,
   minDate: PropTypes.string,
   maxDate: PropTypes.string,
+  sx: PropTypes.object,
   onChange: PropTypes.func.isRequired,
   onError: PropTypes.func,
 }
