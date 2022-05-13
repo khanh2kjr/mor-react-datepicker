@@ -48,17 +48,17 @@ const Datepicker = (props) => {
     onError,
   } = props
 
-  const [year, setYear] = useState(() =>
+  const [year, setYear] = useState(
     value && picker !== 'week'
       ? new Date(formatDateValue(value, format)).getFullYear()
       : currentYear
   )
-  const [month, setMonth] = useState(() =>
+  const [month, setMonth] = useState(
     value && picker !== 'week'
       ? new Date(formatDateValue(value, format)).getMonth() + 1
       : currentMonth
   )
-  const [date, setDate] = useState(() =>
+  const [date, setDate] = useState(
     value && picker !== 'week'
       ? new Date(formatDateValue(value, format)).getDate()
       : currentDate
@@ -205,7 +205,7 @@ const Datepicker = (props) => {
       month,
       date: 1,
     })
-  }, [year, month, format, minDate, maxDate])
+  }, [year, month])
 
   const isPrevMonthDisabled = useMemo(() => {
     const _date = new Date(minDate).getDate()
@@ -214,7 +214,7 @@ const Datepicker = (props) => {
       month: monthStepAction.prev,
       date: _date,
     })
-  }, [year, month, format, minDate, maxDate])
+  }, [year, month])
 
   const isNextMonthDisabled = useMemo(() => {
     const _date = new Date(maxDate).getDate()
@@ -223,7 +223,7 @@ const Datepicker = (props) => {
       month: monthStepAction.next,
       date: _date,
     })
-  }, [year, month, format, minDate, maxDate])
+  }, [year, month])
 
   const isNextYearDisabled = useMemo(() => {
     return setDateDisabled(minDate, maxDate, format, {
@@ -231,7 +231,7 @@ const Datepicker = (props) => {
       month,
       date: 1,
     })
-  }, [year, month, format, minDate, maxDate])
+  }, [year, month])
 
   const isShowFullCalendar = useMemo(() => {
     return isShowDatepicker || isShowWeekPicker
